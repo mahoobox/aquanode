@@ -1,4 +1,8 @@
 DEBUG=True
-SECRET_KEY=supersecretkey
+SECRET_KEY=django-insecure-1e2=vg08w7ui6amb-=&ltw7(c)^(!z*ara$9&%*a$l-r*7ye^+
 ALLOWED_HOSTS=*
-DATABASE_URL=sqlite:///db.sqlite3
+DB_NAME=aquanode
+DB_USER=postgres
+DB_PASSWORD=openpgpwd
+DB_HOST=localhost
+DB_PORT=5432
