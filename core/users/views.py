@@ -27,7 +27,6 @@ def register_user(request):
     :return: Response object
     :rtype: HttpResponse
     :raises Role.DoesNotExist: If the role does not exist
-    :raises Company.DoesNotExist: If the company does not exist
     :raises IntegrityError: If the email already exists
     :raises Exception: If there is an error when registering the user
 
