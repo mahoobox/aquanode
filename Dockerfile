@@ -4,17 +4,10 @@ FROM python:3.13
 # Establece el directorio de trabajo
 WORKDIR /app
 
-# Instalar apt-get y las dependencias necesarias
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    libpq-dev \
-    git \
-    && rm -rf /var/lib/apt/lists/*
-
 # Copia los archivos de requerimientos
 COPY requirements.txt ./
 
-RUN pip install setuptools
+RUN pip install python-dotenv
 
 # Instala las dependencias
 RUN pip install --no-cache-dir -r requirements.txt
