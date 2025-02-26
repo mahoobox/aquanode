@@ -7,6 +7,8 @@ WORKDIR /app
 # Copia los archivos de requerimientos
 COPY requirements.txt ./
 
+RUN pip install python-dotenv
+
 # Instala las dependencias
 RUN pip install --no-cache-dir -r requirements.txt
 
