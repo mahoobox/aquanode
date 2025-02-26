@@ -8,15 +8,8 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     build-essential \
     libpq-dev \
-    libjpeg8-dev \
-    zlib1g-dev \
-    liblcms2-dev \
-    libwebp-dev \
-    tcl8.6-dev \
-    tk8.6-dev \
     git \
     && rm -rf /var/lib/apt/lists/*
-
 
 # Copia los archivos de requerimientos
 COPY requirements.txt ./
