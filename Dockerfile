@@ -15,6 +15,8 @@ COPY requirements.txt ./
 
 RUN pip install python-dotenv
 
+RUN pip install setuptools
+
 # Instala las dependencias
 RUN pip install --no-cache-dir -r requirements.txt
 
