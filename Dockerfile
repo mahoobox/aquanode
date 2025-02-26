@@ -5,7 +5,7 @@ FROM python:3.13
 WORKDIR /app
 
 # Copia los archivos de requerimientos
-COPY requirements.txt ./
+COPY requirements.txt .
 
 RUN pip install python-dotenv
 
