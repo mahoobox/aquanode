@@ -14,11 +14,11 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     python3-dev
 
-# Copia los archivos de requerimientos
-COPY requirements.txt ./
-
 # Establece el directorio de trabajo
 WORKDIR /app
+
+# Copia los archivos de requerimientos
+COPY requirements.txt ./
 
 RUN pip install python-dotenv
 
