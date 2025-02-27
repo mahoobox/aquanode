@@ -13,4 +13,4 @@ oscrypto==1.3.0
 python-dotenv==1.0.0
 cryptography==43.0.1
 asn1crypto==1.5.1
-Pillow==10.1.0
+Pillow

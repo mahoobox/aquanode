@@ -20,6 +20,8 @@ WORKDIR /app
 # Copia los archivos de requerimientos
 COPY requirements.txt ./
 
+RUN pip3 install --upgrade pip setuptools
+
 RUN pip install python-dotenv
 
 # Instala las dependencias
