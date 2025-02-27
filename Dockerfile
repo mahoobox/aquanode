@@ -1,9 +1,6 @@
 # Usa una imagen base oficial de Python
 FROM python:3.13
 
-# Establece el directorio de trabajo
-WORKDIR /app
-
 RUN apt-get update && apt-get install -y \
     libjpeg-dev \
     zlib1g-dev \
@@ -15,11 +12,13 @@ RUN apt-get update && apt-get install -y \
     gfortran \
     git \
     build-essential \
-    python3-dev && \
-    pip install --upgrade pip
+    python3-dev
 
 # Copia los archivos de requerimientos
 COPY requirements.txt ./
+
+# Establece el directorio de trabajo
+WORKDIR /app
 
 RUN pip install python-dotenv
 
