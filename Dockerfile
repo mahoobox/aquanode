@@ -15,7 +15,8 @@ RUN apt-get update && apt-get install -y \
     gfortran \
     git \
     build-essential \
-    python3-dev
+    python3-dev && \
+    pip install --upgrade pip
 
 # Copia los archivos de requerimientos
 COPY requirements.txt ./
