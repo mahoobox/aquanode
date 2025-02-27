@@ -2,17 +2,16 @@
 FROM python:3.13
 
 RUN apt-get update && apt-get install -y \
-    libjpeg-dev \
-    zlib1g-dev \
-    libpng-dev \
-    libfreetype6-dev \
-    liblcms2-dev \
-    libblas-dev \
-    liblapack-dev \
-    gfortran \
-    git \
     build-essential \
-    python3-dev
+    libpq-dev \
+    libjpeg8-dev \
+    zlib1g-dev \
+    liblcms2-dev \
+    libwebp-dev \
+    tcl8.6-dev \
+    tk8.6-dev \
+    git \
+    && rm -rf /var/lib/apt/lists/*
 
 # Establece el directorio de trabajo
 WORKDIR /app
