@@ -4,15 +4,18 @@ FROM python:3.13
 # Establece el directorio de trabajo
 WORKDIR /app
 
-RUN yum install -y \
-    libjpeg-devel \
-    zlib-devel \
-    libpng-devel \
-    freetype-devel \
-    lcms2-devel \
-    blas-devel \
-    lapack-devel \
-    gcc
+RUN apt-get update && apt-get install -y \
+    libjpeg-dev \
+    zlib1g-dev \
+    libpng-dev \
+    libfreetype6-dev \
+    liblcms2-dev \
+    libblas-dev \
+    liblapack-dev \
+    gfortran \
+    git \
+    build-essential \
+    python3-dev
 
 # Copia los archivos de requerimientos
 COPY requirements.txt ./
