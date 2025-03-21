@@ -16,9 +16,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings # type: ignore
+from django.conf.urls.static import static # type: ignore
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("api/users/", include("core.users.urls")),
     path("api/roles/", include("core.roles.urls")),
+    path("api/diagnosis/", include("core.diagnosis.urls")),
 ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

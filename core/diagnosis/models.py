@@ -13,3 +13,7 @@ class Diagnosis(models.Model):
     class Meta:
         db_table = 'Diagnosis'
         ordering = ['id'] 
+        
+class Events(models.Model):
+    events = models.TextField("events", blank=True, null=True)
+    created_at = models.DateTimeField('created_at', auto_now_add=True)        
