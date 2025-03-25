@@ -16,4 +16,5 @@ class Diagnosis(models.Model):
         
 class Events(models.Model):
     events = models.TextField("events", blank=True, null=True)
+    url = models.TextField("url", blank=True, null=True)
     created_at = models.DateTimeField('created_at', auto_now_add=True)        
