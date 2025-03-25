@@ -175,7 +175,6 @@ AUTH_USER_MODEL = "users.User"
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
-    "http://192.168.249.80:8000",
     "http://10.0.2.2:8000",
 ]
 
