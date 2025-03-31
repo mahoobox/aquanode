@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models #type: ignore
 from core.users.models import User
 
 # Create your models here.
@@ -15,6 +15,11 @@ class Diagnosis(models.Model):
         ordering = ['id'] 
         
 class Events(models.Model):
-    events = models.TextField("events", blank=True, null=True)
-    url = models.TextField("url", blank=True, null=True)
+    events = models.CharField("events", max_length=255 , blank=True, null=True) 
+    url = models.URLField()
+    is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField('created_at', auto_now_add=True)        
+    
+    class Meta:
+        db_table = 'Events'
+        ordering = ['id'] 

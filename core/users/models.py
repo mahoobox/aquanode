@@ -44,10 +44,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField('email', unique=True, null=False)
     password = models.CharField(
         'password', max_length=100, null=False)
+    fcm_token = models.CharField(max_length=255, blank=True, null=True)
     avatar = models.ImageField('avatar', default='avatar.png')
     role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True)
     created_at = models.DateTimeField('created_at', auto_now_add=True)
     updated_at = models.DateTimeField('updated_at', auto_now=True)
+    is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     
     objects = CustomUserManager()
