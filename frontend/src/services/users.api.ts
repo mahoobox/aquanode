@@ -14,8 +14,13 @@ export const getUser = async (id: number) => {
 
 
 export const registerUser = async (user: User) => {
-    const response = await authAxios.post('/users/register/', user);
-    return response.data;
+	const response = await authAxios.post("/users/register/", user);
+	return response.data;
+};
+
+export const updateUser = async (id: number, user: User) => {
+	const response = await authAxios.put(`/users/update/${id}/`, user);
+	return response.data;
 };
 
 export const loginUser = async (email: string, password: string) => {

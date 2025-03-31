@@ -100,8 +100,6 @@ def update_user(request, pk):
             user.name = data['name']
             user.last_name = data['last_name']
             user.email = data['email']
-            user.register_number = data['register_number']
-            user.identification_card = data['identification_card']
             user.save()
             serializer = RegisterUserSerializer(user, many=False)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -122,10 +120,8 @@ def update_fcm_token(request):
     fcm_token = request.data.get('fcm_token') 
     if not fcm_token:
         return Response({'error': 'FCM token es requerido'}, status=status.HTTP_400_BAD_REQUEST)
-    
     user.fcm_token = fcm_token
     user.save()
-    
     return Response({'status': 'Token actualizado correctamente'}, status=status.HTTP_200_OK)
 
 
