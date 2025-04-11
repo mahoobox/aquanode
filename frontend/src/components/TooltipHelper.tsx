@@ -11,10 +11,11 @@ const TooltipHelper = ({ message }: TooltipHelperProps) => {
       content={
         <div className="max-w-xs">
           <Typography
-            variant="small"
-            color="blue-gray"
-            className="font-normal opacity-80 text-center"
-            placeholder={message}
+            {...{
+              variant: "small",
+              color: "blue-gray",
+              className: "font-normal opacity-80 text-center",
+            } as React.ComponentProps<typeof Typography>}
           >
             {message}
           </Typography>

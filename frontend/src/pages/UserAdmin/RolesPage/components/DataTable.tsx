@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
 import { Role } from "../../../../interfaces";
-import { DocumentIcon } from "@heroicons/react/24/outline";
-import { getRoles, deleteRole } from "../../../../services/roles.api";
+import RolesModal from "./RolesModal";
+import AlertDelete from "../../../../components/AlertDelete.tsx";
+import { getRoles } from "../../../../services/roles.api";
 
 const DataTableComponent: React.FC = () => {
+  const [shouldDelete, setShouldDelete] = useState(false);
+	const [, setId] = useState<string>("");
   const [data, setData] = useState<Role[]>([]);
   const [filteredData, setFilteredData] = useState<Role[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -19,6 +22,11 @@ const DataTableComponent: React.FC = () => {
     } catch (error) {
       setLoading(false);
     }
+  };
+
+  const handleDelete = (id: string) => {
+    setId(id);
+    setShouldDelete(!shouldDelete);
   };
 
   useEffect(() => {
@@ -41,9 +49,9 @@ const DataTableComponent: React.FC = () => {
   const columns = [
     {
       name: "#",
-      selector: (row: Role) => row.id,
+      selector: (row: Role) => row.id??0,
       sortable: true,
-      cell: (row: Role) => <span data-label="Id">{row.id ?? 0 }</span>
+      cell: (row: Role) => <span data-label="Id">{row.id ?? 0}</span>
     },
     {
       name: "Nombre",
@@ -53,7 +61,7 @@ const DataTableComponent: React.FC = () => {
     },
     {
       name: "Fecha de creación",
-      selector: (row: Role) => {
+      selector: () => {
         const dat = new Date();
         return !isNaN(dat.getTime())
           ? dat.toISOString().split("T")[0]
@@ -63,7 +71,7 @@ const DataTableComponent: React.FC = () => {
     },
     {
       name: "Fecha de Actualización",
-      selector: (row: Role) => {
+      selector: () => {
         const dat = new Date();
         return !isNaN(dat.getTime())
           ? dat.toISOString().split("T")[0]
@@ -75,13 +83,17 @@ const DataTableComponent: React.FC = () => {
       name: "Acciones",
       cell: (row: Role) => (
         <td className="p-4 flex justify-start">
-          <button
-            className={`flex justify-between rounded-lg px-2 py-1 text-sm font-semibold text-apple-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-apple-600 sm:text-lg tracking-wider `}
-          >
-            <DocumentIcon
-              style={{ width: "20px", height: "20px", alignItems: "center", color: "rgb(49 115 34 / var(--tw-text-opacity))" }}  
-            />
-          </button>
+          <RolesModal
+            title={""}
+            id={row.id}
+            style={"hover:text-chileanFire-500"}
+            content={"Editar Rol"}
+          />
+          <AlertDelete
+            title={"Rol"}
+            onDelete={handleDelete}
+            id={row && row.id ? row.id.toString() : ""}
+          />
         </td>
       ),
     },

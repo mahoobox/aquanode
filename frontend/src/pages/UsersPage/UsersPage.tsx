@@ -12,12 +12,13 @@ const UsersPage = () => {
                 <UsersModal
                     title="Crear Usuario"
                     style={
-                        "border-solid border-2 border-chileanFire-600 shadow-sm hover:scale-105 transform transition-all duration-500 hover:bg-chileanFire-500 hover:text-matisse-50"
+                        "border-solid border-2 border-purple-600 shadow-sm hover:scale-105 transform transition-all duration-500 hover:bg-purple-500 hover:text-matisse-50"
                     }
                     content={"Crear Usuario"}
                 />
             </div>
             <div className="overflow-x-auto">
+                {/* @ts-ignore */}
                 <Card className="h-full w-full" placeholder={"Encuestas"}>
                     <DataTableComponent />
                 </Card>

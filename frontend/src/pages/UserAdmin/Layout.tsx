@@ -1,25 +1,69 @@
+import { useState, useEffect, useRef } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { jwtDecode } from "jwt-decode";
+import { jwtDecode } from 'jwt-decode';
 import {
 	LogOut,
 	Home,
 	Settings,
-	Bell
 } from 'lucide-react';
+import { MdMarkChatUnread, MdMarkChatRead } from 'react-icons/md';
+import { FaBell } from 'react-icons/fa';
 import {
 	HomeIcon,
 	UsersIcon,
+	ClipboardDocumentIcon,
 } from "@heroicons/react/24/outline";
 import { useQuery } from "@tanstack/react-query";
+import { Events } from '../../interfaces';
 import { getUser } from "../../services/users.api";
+import { getDiagnosis } from '../../services/events_api';
 import { useAuth } from "../../services/auth";
 import { Token } from "../../interfaces";
 import ModulesPage from './ModulesPage/ModulesPage';
 import { AdminContext } from '../../contexts/AdminContext';
 import toast from "react-hot-toast";
 import Loader from "../../components/Loader";
+import DiagnosisDetailModal from '../../components/DiagnosisDetailModal';
 
 const LayutAdmin = () => {
+	const [notifications, setNotifications] = useState<Events[]>([]);
+	const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
+	const dropdownRef = useRef(null);
+	const [unreadCount, setUnreadCount] = useState<number>(0)
+
+	const limitedNotifications = notifications.slice(0, 5);
+
+	useEffect(() => {
+		const fetchNotifications = async () => {
+			try {
+				const data = await getDiagnosis();
+				setNotifications(data);
+				setUnreadCount(data.filter((notif: any) => !notif.is_read).length);
+			} catch (error) {
+				console.error('Error al obtener las notificaciones:', error);
+			}
+		};
+
+		const handleClickOutside = (event: MouseEvent) => {
+			if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+				setIsDropdownOpen(false);
+			}
+		};
+
+		document.addEventListener("mousedown", handleClickOutside);
+		fetchNotifications();
+		return () => {
+			document.removeEventListener("mousedown", handleClickOutside);
+		};
+
+	}, []);
+
+
+	const handleNotificationClick = () => {
+		setIsDropdownOpen(!isDropdownOpen);
+	};
+
+
 	const { isAuth } = useAuth();
 	const navigate = useNavigate();
 
@@ -77,35 +121,92 @@ const LayutAdmin = () => {
 									<HomeIcon className="w-auto h-5" aria-hidden="true" />
 									Inicio
 								</a>
+								{user.role === "Super Administrador" ? (
+									<>
+										<a
+											onClick={() => {
+												navigate("/admin/roles");
+											}}
+											className="flex items-center gap-2 hover:bg-gradient-to-r from-indigo-600 to-purple-600 transition-all duration-300 ease-in-out rounded-xl p-2 cursor-pointer"
+										>
+											<UsersIcon className="w-auto h-5" aria-hidden="true" />
+											Roles
+										</a>
+										<a
+											onClick={() => {
+												navigate("/admin/usuarios");
+											}}
+											className="flex items-center gap-2 hover:bg-gradient-to-r from-indigo-600 to-purple-600 transition-all duration-300 ease-in-out rounded-xl p-2 cursor-pointer"
+										>
+											<UsersIcon className="w-auto h-5" aria-hidden="true" />
+											Usuarios
+										</a>
+									</>
+								) : null}
 								<a
 									onClick={() => {
-										navigate("/admin/roles");
+										navigate("/admin/eventos");
 									}}
 									className="flex items-center gap-2 hover:bg-gradient-to-r from-indigo-600 to-purple-600 transition-all duration-300 ease-in-out rounded-xl p-2 cursor-pointer"
 								>
-									<UsersIcon className="w-auto h-5" aria-hidden="true" />
-									Roles
-								</a>
-								<a
-									onClick={() => {
-										navigate("/admin/usuarios");
-									}}
-									className="flex items-center gap-2 hover:bg-gradient-to-r from-indigo-600 to-purple-600 transition-all duration-300 ease-in-out rounded-xl p-2 cursor-pointer"
-								>
-									<UsersIcon className="w-auto h-5" aria-hidden="true" />
-									Usuarios
-								</a>
-								<a href="#" className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-									Reports
+									<ClipboardDocumentIcon className="w-auto h-5" aria-hidden="true" />
+									Eventos
 								</a>
 							</div>
 						</div>
 						<div className="flex items-center">
-							<button className="relative p-2 rounded-full text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mr-3">
-								<span className="sr-only">View notifications</span>
-								<Bell className="h-6 w-6" aria-hidden="true" />
-								<span className="absolute top-0 right-0 block h-2.5 w-2.5 rounded-full bg-red-400 ring-2 ring-white"></span>
-							</button>
+							<div className="relative">
+								<div
+									style={{ cursor: 'pointer' }}
+									onClick={handleNotificationClick}
+								>
+									<FaBell size={25} color="#007bff" />
+									{unreadCount > 0 && (
+										<div
+											className="absolute top-0 right-0 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center"
+											style={{ transform: 'translate(50%, -50%)' }}
+										>
+											{unreadCount}
+										</div>
+									)}
+								</div>
+								{isDropdownOpen && (
+									<div ref={dropdownRef} className="absolute top-10 right-0 bg-white shadow-lg rounded-lg w-64 p-4 border border-gray-300 z-10">
+										<h3 className="font-semibold text-lg mb-2">Notificaciones</h3>
+										{limitedNotifications.length > 0 ? (
+											limitedNotifications.map((notif: any) => (
+												<div
+													key={notif.id}
+													className={`flex items-center text-sm mb-2 p-2 border-b ${notif.is_read ? 'text-gray-500' : 'text-black'}`}
+												>
+													{notif.is_read ? (
+														<MdMarkChatRead size={20} className="mr-2 text-green-500" />
+													) : (
+														<MdMarkChatUnread size={20} className="mr-2 text-red-500" />
+													)}
+													<p ref={dropdownRef} className="flex-1">{notif.events}</p>  <DiagnosisDetailModal
+														title=""
+														style={"hover:text-chileanFire-500"}
+														content={"Ver Evento"}
+														id={notif.id}
+														user={user}
+													/>
+												</div>
+											))
+										) : (
+											<p className="text-gray-500 text-xs">No hay notificaciones</p>
+										)}
+										<div										
+											onClick={() => {
+												navigate("/admin/eventos");
+											}}											
+											className="mt-4 text-center cursor-pointer"
+										>
+											Ver más
+										</div>
+									</div>
+								)}
+							</div>
 							<button className="p-2 rounded-full text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mr-3">
 								<span className="sr-only">Settings</span>
 								<Settings className="h-6 w-6" aria-hidden="true" />
@@ -134,7 +235,7 @@ const LayutAdmin = () => {
 						</div>
 					</div>
 				</div>
-			</nav>
+			</nav >
 			<main className="p-12">
 				{location.pathname === "/admin" ? (
 					<ModulesPage />
@@ -145,7 +246,7 @@ const LayutAdmin = () => {
 				)}
 
 			</main>
-		</div>
+		</div >
 	);
 };
 

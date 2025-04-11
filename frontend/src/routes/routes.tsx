@@ -10,6 +10,7 @@ import Login from "../pages/login/login";
 import LayoutAdmin from "../pages/UserAdmin/Layout";
 import UsersPage from "../pages/UsersPage/UsersPage";
 import RolesPage from "../pages/UserAdmin/RolesPage/RolesPage";
+import EventsPage from "../pages/UserAdmin/EventsPage/Events";
 import { useAuth } from "../services/auth";
 import { jwtDecode } from "jwt-decode";
 import { Token } from "../interfaces";
@@ -54,8 +55,6 @@ const router = createBrowserRouter([
         path: "/inicio",
         element: <Login />,
     },
-
-
     {
         path: "/admin",
         element: (
@@ -64,7 +63,6 @@ const router = createBrowserRouter([
             </PrivateRoute>
         ),
         children: [
-
             {
                 path: "usuarios",
                 element: (
@@ -81,14 +79,16 @@ const router = createBrowserRouter([
                     </PrivateRouteSuperAdmin>
                 ),
             },
-
+            {
+                path: "eventos",
+                element: <EventsPage />,
+            },
             {
                 path: "*",
                 element: <NotFound />,
             },
         ]
     },
-
     {
         path: "*",
         element: <NotFound />,

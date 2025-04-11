@@ -2,8 +2,10 @@ import axios, { AxiosRequestHeaders } from 'axios';
 import { useAuth } from '../services/auth';
 import { jwtDecode } from 'jwt-decode';
 import { Token } from '../interfaces/index';
+import CryptoJS from "crypto-js";
 
-const baseURL = 'http://127.0.0.1:8000/api';
+const baseURL = "http://192.168.101.200:8000/api";
+const pass_secret = "CewPTOb;k/X<A>^U'^:keV9?t1*vHZL)";
 
 function logout() {
     useAuth.getState().logout();
@@ -42,4 +44,24 @@ authAxios.interceptors.request.use(async (config) => {
     return config;
 }
 );
+
+export const encryptPassword = (password: string): string => {
+	const iv = CryptoJS.lib.WordArray.random(16);
+
+	const key = CryptoJS.SHA256(pass_secret);
+
+	const encrypted = CryptoJS.AES.encrypt(password, key, {
+		iv: iv,
+		mode: CryptoJS.mode.CBC,
+		padding: CryptoJS.pad.Pkcs7,
+	});
+
+	const ivBase64 = CryptoJS.enc.Base64.stringify(iv);
+	const encryptedBase64 = encrypted.ciphertext.toString(CryptoJS.enc.Base64);
+
+	const encryptedString = `${ivBase64}::${encryptedBase64}`;
+
+	return encryptedString;
+};
+
 

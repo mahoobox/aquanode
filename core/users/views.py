@@ -10,6 +10,7 @@ from .models import User
 from core.roles.models import Role
 from .forms import UserValidator
 from core.decorators.decorators import permission_required
+from core.utils.encryption import decrypt_password
 # Create your views here.
 
 
@@ -40,24 +41,21 @@ def register_user(request):
                 last_name=data['last_name'],
                 email=data['email'],
                 password=make_password(data['password']),
-                register_number=data['register_number'],
-                identification_card=data['identification_card'],
                 role=role,
             )
             serializer = RegisterUserSerializer(user, many=False)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
-            message = {'detail': 'La información enviada no es válida'}
+            message = {"detail": "La información enviada no es válida"}
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
     except Role.DoesNotExist:
-        message = {'detail': 'El rol no existe'}
+        message = {"detail": "El rol no existe"}
         return Response(message, status=status.HTTP_400_BAD_REQUEST)
     except IntegrityError:
-        message = {'detail': 'El email ya existe'}
+        message = {"detail": "El email ya existe"}
         return Response(message, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
-        message = {'detail': f'Error al registrar el usuario: {str(e)}'}
-        print("Mensaje", message)
+        message = {"detail": f"Error al registrar el usuario: {str(e)}"}
         return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -81,13 +79,9 @@ def get_user(request, pk):
         user = User.objects.get(id=pk)
         serializer = RegisterUserSerializer(user, many=False)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    except User.DoesNotExist:
-        message = {'detail': 'El usuario no existe'}
-        return Response(message, status=status.HTTP_404_NOT_FOUND)
-    except Exception as e:
-        print("Error:", str(e))
-        return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
+    except:
+        message = {"detail": "El usuario no existe"}
+        return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
@@ -128,3 +122,27 @@ def update_fcm_token(request):
 class LoginUserView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer    
     
+    def post(self, request, *args, **kwargs):
+        try:
+            data = request.data.copy()
+
+            if "password" not in data or not data["password"]:
+                message = {"detail": "La contraseña es requerida"}
+                return Response(message, status=status.HTTP_400_BAD_REQUEST)
+            try:
+
+                descrypted_password = decrypt_password(data["password"])
+                data["password"] = descrypted_password
+            except ValueError as descryption_error:
+                message = {
+                    "detail": f"Error al descifrar la contraseña: {str(descryption_error)}"
+                }
+                return Response(message, status=status.HTTP_400_BAD_REQUEST)
+
+            request._full_data = data
+
+            return super().post(request, *args, **kwargs)
+
+        except Exception as e:
+            message = {"detail": f"Error al iniciar sesión: {str(e)}"}
+            return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

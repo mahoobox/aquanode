@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
 import { User } from "../../../interfaces";
-import { DocumentIcon } from "@heroicons/react/24/outline";
+import UsersModal from "./UsersModal";
 import { getUsers } from "../../../services/users.api";
 
 const DataTableComponent: React.FC = () => {
@@ -41,9 +41,9 @@ const DataTableComponent: React.FC = () => {
   const columns = [
     {
       name: "#",
-      selector: (row: User) => row.id,
+      selector: (row: User) => row.id ?? 0,
       sortable: true,
-      cell: (row: User) => <span data-label="Id">{row.id ?? 0 }</span>
+      cell: (row: User) => <span data-label="Id">{row.id ??0}</span>
     },
     {
       name: "Nombre",
@@ -65,7 +65,7 @@ const DataTableComponent: React.FC = () => {
     },
     {
       name: "Fecha de Actualización",
-      selector: (row: User) => {
+      selector: () => {
         const dat = new Date();
         return !isNaN(dat.getTime())
           ? dat.toISOString().split("T")[0]
@@ -77,13 +77,12 @@ const DataTableComponent: React.FC = () => {
       name: "Acciones",
       cell: (row: User) => (
         <td className="p-4 flex justify-start">
-          <button
-            className={`flex justify-between rounded-lg px-2 py-1 text-sm font-semibold text-apple-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-apple-600 sm:text-lg tracking-wider `}
-          >
-            <DocumentIcon
-              style={{ width: "20px", height: "20px", alignItems: "center", color: "rgb(49 115 34 / var(--tw-text-opacity))" }}  
-            />
-          </button>
+          <UsersModal
+            title={""}
+            id={row.id}
+            style={"hover:text-chileanFire-500"}
+            content={"Editar Usuario"}
+          />
         </td>
       ),
     },

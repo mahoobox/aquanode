@@ -23,3 +23,38 @@ body {
         radial-gradient(at 0% 0%, hsla(343, 100%, 76%, 0.1) 0px, transparent 50%);
 }
 
+select {
+    /* Establece la apariencia del icono como "none" */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.invisible {
+    visibility: hidden;
+    height: 0;
+    margin: 0;
+    padding: 0;
+    opacity: 0;
+    pointer-events: none;
+
+    transition: opacity 2s ease-in-out, height 2s ease-in-out;
+}
+
+.visible {
+    visibility: visible;
+    height: auto;
+    opacity: 1;
+    pointer-events: auto;
+
+    transition: opacity 0.2s ease-in-out, height 0.2s ease-in-out;
+}
+
+.btn-primary {
+    @apply rounded-md bg-gradient-to-r from-indigo-600 to-purple-600 px-5 py-2 text-sm font-semibold text-matisse-50 shadow-sm transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 hover:from-indigo-600 hover:to-purple-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600 sm:text-base tracking-wider;
+}
+
+.btn-second {
+    @apply rounded-md border-solid border-2 border-red-600 px-5 py-1 mx-10 text-sm font-semibold text-red-600 shadow-sm hover:bg-red-400 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-chileanFire-600 sm:text-lg tracking-wider;
+}
+

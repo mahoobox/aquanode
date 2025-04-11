@@ -5,7 +5,11 @@ import { useForm } from "react-hook-form";
 import ButtonProcess from "../../../../components/ButtonProcess";
 import { Role } from "../../../../interfaces";
 import { NewError } from "../../../../interfaces";
-import { registerRole, updateRole, getRole } from "../../../../services/roles.api";
+import {
+	registerRole,
+	getRole,
+	updateRole,
+} from "../../../../services/roles.api";
 import { toast } from "react-hot-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -91,6 +95,7 @@ const RolesModal = ({ title, style, content, id }: RolesModalProps) => {
 	const onSubmit = handleSubmit(async () => {
 		setAnimation(true);
 		if (id) {
+
 			await updateMutation.mutateAsync();
 		} else {
 			await registerMutation.mutateAsync();
@@ -115,7 +120,7 @@ const RolesModal = ({ title, style, content, id }: RolesModalProps) => {
 		<>
 			<button
 				onClick={handleShowModal}
-				className={`flex justify-between rounded-lg px-2 py-1 text-base font-semibold text-chileanFire-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-chileanFire-600 sm:text-lg tracking-wider ${style}`}
+				className={`flex justify-between rounded-lg px-2 py-1 text-base font-semibold text-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:text-lg tracking-wider ${style}`}
 			>
 				<PencilIcon className="w-auto h-6 sm:h-7 mr-3" aria-hidden="true" />
 				{title}
@@ -160,15 +165,13 @@ const RolesModal = ({ title, style, content, id }: RolesModalProps) => {
 														minLength: 3,
 														pattern: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/i,
 													})}
-													className={`text-sm block w-full rounded-md border-0 p-1.5 shadow-sm ring-1 ring-inset ring-slateGray-300 sm:text-base sm:leading-6 ${
-														errors.name ? "border-2 border-red-500" : ""
-													}`}
+													className={`text-sm block w-full rounded-md border-0 p-1.5 shadow-sm ring-1 ring-inset ring-slateGray-300 sm:text-base sm:leading-6 ${errors.name ? "border-2 border-red-500" : ""
+														}`}
 												/>
 											</div>
 											<span
-												className={`absolute text-sm text-red-500 ${
-													errors.name ? "visible" : "invisible"
-												}`}
+												className={`absolute text-sm text-red-500 ${errors.name ? "visible" : "invisible"
+													}`}
 											>
 												Verifique este campo obligatorio
 											</span>
@@ -186,13 +189,13 @@ const RolesModal = ({ title, style, content, id }: RolesModalProps) => {
 										{(animation && (
 											<ButtonProcess text={"Guardando..."} width={""} />
 										)) || (
-											<button
-												onClick={(e) => e.preventDefault}
-												className="btn-primary"
-											>
-												Guardar
-											</button>
-										)}
+												<button
+													onClick={(e) => e.preventDefault}
+													className="btn-primary"
+												>
+													Guardar
+												</button>
+											)}
 									</div>
 								</form>
 							</div>

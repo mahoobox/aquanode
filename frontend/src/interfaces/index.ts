@@ -10,13 +10,10 @@ export interface User {
   id?: number;
   name: string;
   last_name: string;
-  password: string;
+  password?: string;
   email: string;
-  register_number: string;
-  identification_card: string;
   role: string;
-  company_name: string;
-  avatar: File | null;
+  updated_at?: string;
 }
 
 export interface Token {
@@ -25,13 +22,29 @@ export interface Token {
   name: string;
   last_name: string;
   role: string;
-  company: string;
   avatar: File | null;
 }
 
 export interface Role {
-  id?: number;
-  name: string;
+	id?: number;
+	name: string;
+	created_at?: string;
+	updated_at?: string;
+}
+
+export interface Events {
+  id: number;
+  events: string;
+  url: string;
+  observation: string;
+  aprobbed: boolean;
+  is_read: boolean;
   created_at?: string;
+}
+
+export interface Event {
+  observation: string;
+  aprobbed: boolean;
+  user_id: number;
   updated_at?: string;
 }

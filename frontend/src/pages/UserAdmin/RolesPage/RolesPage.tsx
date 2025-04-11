@@ -14,14 +14,17 @@ const RolesPage = () => {
                 <RolesModal
                     title="Crear Rol"
                     style={
-                        "border-solid border-2 border-chileanFire-600 shadow-sm hover:scale-105 transform transition-all duration-500 hover:bg-chileanFire-500 hover:text-matisse-50"
+                        "border-solid border-2 border-purple-600 shadow-sm hover:scale-105 transform transition-all duration-500 hover:bg-purple-500 hover:text-matisse-50"
                     }
                     content={"Crear Rol"}
                 />
             </div>
             <div className="overflow-x-auto">
-                <Card className="h-full w-full" placeholder={"Roles"}>
-                    <DataTableComponent />
+                {/* @ts-ignore */}
+                <Card className="h-full w-full">
+                    <table className="w-full min-w-max table-auto text-left">
+                        <DataTableComponent />
+                    </table>
                 </Card>
             </div>
         </>

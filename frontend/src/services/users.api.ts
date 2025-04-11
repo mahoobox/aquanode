@@ -1,5 +1,5 @@
 import { User } from '../interfaces/index';
-import { authAxios, axi } from '../hooks/useAxios';
+import { authAxios, axi, encryptPassword} from '../hooks/useAxios';
 
 export const getUsers = async () => {
     const response = await authAxios.get('/users/list/');
@@ -24,7 +24,11 @@ export const updateUser = async (id: number, user: User) => {
 };
 
 export const loginUser = async (email: string, password: string) => {
-    const response = await axi.post('/users/login/', { email, password });
-    console.log("Los datos son: ", response.data)
-    return response;
+	const password_encrypted = encryptPassword(password);
+	const response = await axi.post("/users/login/", {
+		email,
+		password: password_encrypted,
+	});
+	return response;
 };
+
