@@ -5,7 +5,7 @@ import {
     EyeIcon,
 } from "@heroicons/react/24/outline";
 import { toast } from "react-hot-toast";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import TooltipHelper from "../components/TooltipHelper";
 import ButtonProcess from "../components/ButtonProcess";
 import { getEvent, UpdateEventRead, UpdateEvent } from '../services/events_api';
@@ -196,7 +196,7 @@ const DiagnosisDetailModal = ({ title, style, content, user, id }: DiagnosisDeta
                                         <div className="sm:col-span-12 sm:col-start-1">
                                             <div className="flex">
                                                 <label
-                                                    htmlFor="name"
+                                                    htmlFor="events"
                                                     className="block text-sm font-medium leading-6 flex-initial mr-2 sm:text-base"
                                                 >
                                                     * Mensaje
@@ -243,7 +243,7 @@ const DiagnosisDetailModal = ({ title, style, content, user, id }: DiagnosisDeta
                                                 <div className="sm:col-span-2 sm:col-start-1">
                                                     <div className="flex">
                                                         <label
-                                                            htmlFor="birthDate"
+                                                            htmlFor="observation"
                                                             className="block text-sm font-medium leading-6 flex-initial mr-2 sm:text-base"
                                                         >
                                                             * Observación.

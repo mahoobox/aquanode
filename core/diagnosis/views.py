@@ -7,6 +7,7 @@ from .serializers import EventsSerializer, DiagnosisSerializer
 from aquanodecore import FCMManager as fcm
 from .models import Events, Diagnosis
 from core.users.models import User
+import requests  #type: ignore
 # Create your views here.
 
 
@@ -67,12 +68,12 @@ def get_all(request):
 
     """
     try:
-        survery = Events.objects.all()
+        survery = Events.objects.all().order_by('-created_at')
         
         serializer = EventsSerializer(survery, many=True)     
         return Response(serializer.data)
     except:
-        message = {"detail": "No hay Diagnosticos registrados"}
+        message = {"detail": "No hay Eventos registrados"}
         return Response(message, status=status.HTTP_400_BAD_REQUEST)    
     
 @api_view(['GET'])
@@ -134,7 +135,6 @@ def register_diagnosis(request):
 
     """  
     try:
-        
         file = request.FILES.get('analyzed_image')
         data = request.data
 
@@ -149,10 +149,16 @@ def register_diagnosis(request):
 
         sano = safe_float_from_form(request.data, 'model_result[Ojo Sano]')
         nublado = safe_float_from_form(request.data, 'model_result[Ojo Nublado]')
+        branquias = safe_float_from_form(request.data, 'model_result[branquias]')
+        hongos = safe_float_from_form(request.data, 'model_result[hongos]')
+        ich = safe_float_from_form(request.data, 'model_result[ich]')
 
         resultado_final = {
             'Ojo Sano': sano,
-            'Ojo Nublado': nublado
+            'Ojo Nublado': nublado,
+            'Branquias': branquias,
+            'Hongos': hongos,
+            'ICH': ich
         }
         user = User.objects.get(id=data['user_id'])
         defaults = {
@@ -185,3 +191,73 @@ def update_answer(request, pk):
         return Response({'status': 'actualizado'}, status=status.HTTP_200_OK)
     except Diagnosis.DoesNotExist:
         return Response({'error': 'No encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_all_diagnosis(request):
+    """
+    Get all Diagnosis
+
+    """
+    try:
+        diag = Diagnosis.objects.all().order_by('-created_at')
+        data = []
+        for n in diag:
+            data.append({
+            'id': n.id,
+            'model_result': n.model_result,
+            'user': n.user.name,
+            'created_at': n.created_at
+            })
+        return Response(data)
+    except:
+        message = {"detail": "No hay Diagnosticos registrados"}
+        return Response(message, status=status.HTTP_400_BAD_REQUEST)    
+    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_diagnosis_detail(request, pk):
+    """
+    Get Diagnosis Detail
+
+    """
+    try:
+        diag = Diagnosis.objects.filter(id=pk)
+        data = []
+        for n in diag:
+            location = obtener_direccion_desde_coordenadas(n.ubicacion)
+            data.append({
+            'id': n.id,
+            'analyzed_image': n.analyzed_image.url if n.analyzed_image else None,
+            'model_result': n.model_result,
+            'model_answer': n.model_answer,
+            'ubicacion': location,
+            'user': n.user.name + " " + n.user.last_name,
+            'created_at': n.created_at
+            })
+        return Response(data)
+    except:
+        message = {"detail": "No hay Diagnosticos registrados"}
+        return Response(message, status=status.HTTP_400_BAD_REQUEST)     
+
+def obtener_direccion_desde_coordenadas(coordenadas):
+    try:
+        lat, lon = coordenadas.split(",")
+        url = 'https://nominatim.openstreetmap.org/reverse'
+        params = {
+            'format': 'json',
+            'lat': lat.strip(),
+            'lon': lon.strip(),
+            'zoom': 18,
+            'addressdetails': 1
+        }
+        headers = {
+            'User-Agent': 'aquanode/1.0 (acuicultura25@gmail.com)'  # Cambiá esto por algo real
+        }
+        response = requests.get(url, params=params, headers=headers)
+        response.raise_for_status()  # Lanza error si la respuesta no fue 200 OK
+        data = response.json()
+        return data.get('display_name', 'Dirección no encontrada')
+    except Exception as e:
+        return f"Error al obtener dirección: {e}"

@@ -43,7 +43,7 @@ const DataTableComponent: React.FC = () => {
       name: "#",
       selector: (row: User) => row.id ?? 0,
       sortable: true,
-      cell: (row: User) => <span data-label="Id">{row.id ??0}</span>
+      cell: (row: User) => <span data-label="Id">{row.id ?? 0}</span>
     },
     {
       name: "Nombre",
@@ -64,9 +64,9 @@ const DataTableComponent: React.FC = () => {
       cell: (row: User) => <span data-label="Rol">{row.role}</span>
     },
     {
-      name: "Fecha de Actualización",
-      selector: () => {
-        const dat = new Date();
+      name: "Fecha de Creación",
+      selector: (row: User) => {
+        const dat = new Date(row.created_at);
         return !isNaN(dat.getTime())
           ? dat.toISOString().split("T")[0]
           : "Fecha no válida";

@@ -13,7 +13,7 @@ export interface User {
   password?: string;
   email: string;
   role: string;
-  updated_at?: string;
+  created_at?: string;
 }
 
 export interface Token {
@@ -47,4 +47,23 @@ export interface Event {
   aprobbed: boolean;
   user_id: number;
   updated_at?: string;
+}
+
+export interface Diagosis {
+  id: number;
+  model_result:  Record<string, number>;
+  user: string;
+  ubicacion: string;
+  model_answer: string;
+  created_at?: string;
+}
+
+
+export interface DiagosisDetail {
+  id: number;
+  model_result:  Record<string, number>;
+  user: string;
+  ubicacion: string;
+  model_answer: string;
+  created_at?: string;
 }

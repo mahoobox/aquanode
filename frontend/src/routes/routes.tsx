@@ -11,6 +11,7 @@ import LayoutAdmin from "../pages/UserAdmin/Layout";
 import UsersPage from "../pages/UsersPage/UsersPage";
 import RolesPage from "../pages/UserAdmin/RolesPage/RolesPage";
 import EventsPage from "../pages/UserAdmin/EventsPage/Events";
+import DiagnosisPage from "../pages/UserAdmin/DiagnosisPage/DiagnosisPage";
 import { useAuth } from "../services/auth";
 import { jwtDecode } from "jwt-decode";
 import { Token } from "../interfaces";
@@ -40,7 +41,7 @@ const PrivateRouteSuperAdmin = ({ children }: { children: ReactNode }) => {
         ? jwtDecode<Token>(useAuth.getState().getToken().access).role
         : "";
     if (!isAuth || role !== "Super Administrador") {
-        return <Navigate to="/admin/modulos" />;
+        return <Navigate to="/admin/Users" />;
     }
     return <>{children}</>;
 };
@@ -84,6 +85,10 @@ const router = createBrowserRouter([
                 element: <EventsPage />,
             },
             {
+                path: "diagnosticos",
+                element: <DiagnosisPage />,
+            },
+            {
                 path: "*",
                 element: <NotFound />,
             },
@@ -99,6 +104,7 @@ export const Routes = () => {
     return (
         <QueryClientProvider client={queryClient}>
             <RouterProvider router={router} />
+
         </QueryClientProvider>
     );
 };

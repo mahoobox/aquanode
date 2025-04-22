@@ -4,8 +4,8 @@ import { jwtDecode } from 'jwt-decode';
 import { Token } from '../interfaces/index';
 import CryptoJS from "crypto-js";
 
-const baseURL = "http://192.168.101.200:8000/api";
-const pass_secret = "CewPTOb;k/X<A>^U'^:keV9?t1*vHZL)";
+const baseURL = import.meta.env.VITE_BACKEND_URL;
+const pass_secret = import.meta.env.VITE_PASS_SECRET;
 
 function logout() {
     useAuth.getState().logout();

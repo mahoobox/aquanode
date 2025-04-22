@@ -1,10 +1,11 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import {
 	LogOut,
 	Home,
 	Settings,
+	Menu,
 } from 'lucide-react';
 import { MdMarkChatUnread, MdMarkChatRead } from 'react-icons/md';
 import { FaBell } from 'react-icons/fa';
@@ -30,6 +31,7 @@ const LayutAdmin = () => {
 	const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
 	const dropdownRef = useRef(null);
 	const [unreadCount, setUnreadCount] = useState<number>(0)
+	const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
 
 	const limitedNotifications = notifications.slice(0, 5);
 
@@ -111,7 +113,7 @@ const LayutAdmin = () => {
 									Acuicultura
 								</h1>
 							</div>
-							<div className="hidden sm:ml-8 sm:flex sm:space-x-8">
+							<div className="hidden md:ml-8 md:flex md:space-x-8">
 								<a
 									onClick={() => {
 										navigate("/admin");
@@ -141,6 +143,15 @@ const LayutAdmin = () => {
 											<UsersIcon className="w-auto h-5" aria-hidden="true" />
 											Usuarios
 										</a>
+										<a
+											onClick={() => {
+												navigate("/admin/diagnosticos");
+											}}
+											className="flex items-center gap-2 hover:bg-gradient-to-r from-indigo-600 to-purple-600 transition-all duration-300 ease-in-out rounded-xl p-2 cursor-pointer"
+										>
+											<ClipboardDocumentIcon className="w-auto h-5" aria-hidden="true" />
+											Diagnósticos
+										</a>
 									</>
 								) : null}
 								<a
@@ -153,6 +164,15 @@ const LayutAdmin = () => {
 									Eventos
 								</a>
 							</div>
+						</div>
+						{/* Mobile menu button */}
+						<div className="md:hidden flex items-center">
+							<button
+								onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+								className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+							>
+								<Menu className="h-6 w-6" />
+							</button>
 						</div>
 						<div className="flex items-center">
 							<div className="relative">
@@ -196,10 +216,10 @@ const LayutAdmin = () => {
 										) : (
 											<p className="text-gray-500 text-xs">No hay notificaciones</p>
 										)}
-										<div										
+										<div
 											onClick={() => {
 												navigate("/admin/eventos");
-											}}											
+											}}
 											className="mt-4 text-center cursor-pointer"
 										>
 											Ver más
@@ -207,34 +227,111 @@ const LayutAdmin = () => {
 									</div>
 								)}
 							</div>
-							<button className="p-2 rounded-full text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mr-3">
-								<span className="sr-only">Settings</span>
-								<Settings className="h-6 w-6" aria-hidden="true" />
-							</button>
-							<div className="ml-3 relative flex items-center">
-								<div className="flex-shrink-0">
-									<img
-										className="h-8 w-8 rounded-full"
-										src={`http://127.0.0.1:8000${avatar}`}
-										alt="avatar"
-									/>
-								</div>
+							<div className="hidden md:flex items-center">
+								<div className="ml-8 relative flex items-center">
+									<div className="flex-shrink-0">
+										<img
+											className="h-8 w-8 rounded-full"
+											src={`${import.meta.env.VITE_IMAGE_URL}${avatar}`}
+											alt="avatar"
+										/>
+									</div>
 
-								<div className="ml-3">
-									<div className="text-base font-medium text-gray-800">{user?.name}</div>
-									<div className="text-sm font-medium text-gray-500">{user?.email}</div>
+									<div className="ml-3">
+										<div className="text-base font-medium text-gray-800">{user?.name}</div>
+										<div className="text-sm font-medium text-gray-500">{user?.email}</div>
+									</div>
+									<button
+										onClick={LogOutTwo}
+										className="ml-4 p-2 rounded-full text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+									>
+										<span className="sr-only">Logout</span>
+										<LogOut className="h-6 w-6" aria-hidden="true" />
+									</button>
 								</div>
-								<button
-									onClick={LogOutTwo}
-									className="ml-4 p-2 rounded-full text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-								>
-									<span className="sr-only">Logout</span>
-									<LogOut className="h-6 w-6" aria-hidden="true" />
-								</button>
 							</div>
 						</div>
 					</div>
 				</div>
+				{/* Mobile menu */}
+				{isMobileMenuOpen && (
+					<div className="md:hidden">
+						<div className="pt-2 pb-3 space-y-1">
+							<a
+								onClick={() => {
+									navigate("/admin");
+								}}
+								className="flex items-center gap-2 hover:bg-gradient-to-r from-indigo-600 to-purple-600 transition-all duration-300 ease-in-out rounded-xl p-2 cursor-pointer"
+							>
+								<HomeIcon className="w-auto h-5" aria-hidden="true" />
+								Inicio
+							</a>
+							{user.role === "Super Administrador" ? (
+								<>
+									<a
+										onClick={() => {
+											navigate("/admin/roles");
+										}}
+										className="flex items-center gap-2 hover:bg-gradient-to-r from-indigo-600 to-purple-600 transition-all duration-300 ease-in-out rounded-xl p-2 cursor-pointer"
+									>
+										<UsersIcon className="w-auto h-5" aria-hidden="true" />
+										Roles
+									</a>
+									<a
+										onClick={() => {
+											navigate("/admin/usuarios");
+										}}
+										className="flex items-center gap-2 hover:bg-gradient-to-r from-indigo-600 to-purple-600 transition-all duration-300 ease-in-out rounded-xl p-2 cursor-pointer"
+									>
+										<UsersIcon className="w-auto h-5" aria-hidden="true" />
+										Usuarios
+									</a>
+									<a
+										onClick={() => {
+											navigate("/admin/diagnosticos");
+										}}
+										className="flex items-center gap-2 hover:bg-gradient-to-r from-indigo-600 to-purple-600 transition-all duration-300 ease-in-out rounded-xl p-2 cursor-pointer"
+									>
+										<ClipboardDocumentIcon className="w-auto h-5" aria-hidden="true" />
+										Diagnósticos
+									</a>
+								</>
+							) : null}
+							<a
+								onClick={() => {
+									navigate("/admin/eventos");
+								}}
+								className="flex items-center gap-2 hover:bg-gradient-to-r from-indigo-600 to-purple-600 transition-all duration-300 ease-in-out rounded-xl p-2 cursor-pointer"
+							>
+								<ClipboardDocumentIcon className="w-auto h-5" aria-hidden="true" />
+								Eventos
+							</a>
+						</div>
+						<div className="pt-4 pb-3 border-t border-gray-200">
+							<div className="flex items-center px-4">
+								<div className="flex-shrink-0">
+									<img
+										className="h-8 w-8 rounded-full"
+										src={`${import.meta.env.VITE_IMAGE_URL}${avatar}`}
+										alt="avatar"
+									/>
+								</div>
+								<div className="ml-3">
+									<div className="text-base font-medium text-gray-800">{user?.name || 'Demo User'}</div>
+									<div className="text-sm font-medium text-gray-500">{user?.email || 'demo@example.com'}</div>
+								</div>
+							</div>
+							<div className="mt-3 space-y-1">
+								<button
+									onClick={LogOutTwo}
+									className="w-full text-left block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100"
+								>
+									Logout
+								</button>
+							</div>
+						</div>
+					</div>
+				)}
 			</nav >
 			<main className="p-12">
 				{location.pathname === "/admin" ? (

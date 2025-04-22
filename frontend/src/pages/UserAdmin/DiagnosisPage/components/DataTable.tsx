@@ -1,32 +1,19 @@
 import React, { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
-import { useContext } from "react";
-import { AdminContext } from "../../../../contexts/AdminContext";
-import { Events } from "../../../../interfaces";
-import { getEvents } from '../../../../services/events_api';
-import { getUser } from "../../../../services/users.api";
-import { MdMarkChatUnread, MdMarkChatRead } from 'react-icons/md';
-import { useQuery } from "@tanstack/react-query";
-import DiagnosisDetailModal from "../../../../components/DiagnosisDetailModal";
+import { Diagosis } from "../../../../interfaces";
+import { getDiagnosis } from '../../../../services/diagnosis_api';
+import DiagnosisDetailsModal from "./ModalDiagnosis";
 
 const DataTableComponent: React.FC = () => {
-    const [data, setData] = useState<Events[]>([]);
-    const [filteredData, setFilteredData] = useState<Events[]>([]);
+    const [data, setData] = useState<Diagosis[]>([]);
+    const [filteredData, setFilteredData] = useState<Diagosis[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [searchText, setSearchText] = useState<string>("");
-    const { userId } = useContext(AdminContext);
 
-    const {
-        data: user,
-    } = useQuery({
-        queryKey: ["user", userId],
-        queryFn: () => getUser(userId),
-        enabled: !!userId,
-    });
 
     const fetchData = async () => {
         try {
-            const data = await getEvents();
+            const data = await getDiagnosis();
             setData(data);
             setFilteredData(data);
             setLoading(false);
@@ -55,52 +42,30 @@ const DataTableComponent: React.FC = () => {
     const columns = [
         {
             name: "#",
-            selector: (row: Events) => row.id ?? 0,
+            selector: (row: Diagosis) => row.id ?? 0,
             sortable: true,
-            cell: (row: Events) => {
-                const icon = row.is_read === true
-                    ? <MdMarkChatRead className="h-5 w-5 text-green-500 mr-2" />
-                    : row.is_read === false
-                        ? <MdMarkChatUnread className="h-5 w-5 text-red-500 mr-2" />
-                        : null;
-
-                return (
-                    <span data-label="Id" className="flex items-center">
-                        {icon}
-                        {row.id ?? 0}
-                    </span>
-                );
-            }
         },
         {
-            name: "Evento",
-            selector: (row: Events) => row.events,
-            sortable: true,
-            cell: (row: Events) => <span data-label="Evento">{row.events}</span>
+            name: "Resultado",
+            sortable: false,
+            cell: (row: Diagosis) => (
+                <div data-label="Resultado">
+                    {Object.entries(row.model_result ?? {}).map(([clave, valor]) => (
+                        <div key={clave}>
+                            {typeof valor === "number" ? `${clave}: ${valor.toFixed(2)}` : `${clave}: N/A`}
+                        </div>
+                    ))}
+                </div>
+            )
         },
         {
-            name: "Oservaciones",
-            selector: (row: Events) => row.observation,
+            name: "Usuario",
+            selector: (row: Diagosis) => row.user,
             sortable: true,
-            cell: (row: Events) => <span data-label="Oservaciones">{row.observation}</span>
-        },
-        {
-            name: "Aprovado",
-            selector: (row: Events) => row.aprobbed,
-            sortable: true,
-            cell: (row: Events) => {
-                if (row.aprobbed === null) {
-                    return <span data-label="aprovado"></span>;
-                } else if (row.aprobbed === true) {
-                    return <span data-label="aprovado">Aprobado</span>;
-                } else {
-                    return <span data-label="aprovado">Desaprobado</span>;
-                }
-            }
         },
         {
             name: "Fecha de Creación",
-            selector: (row: Events) => {
+            selector: (row: Diagosis) => {
                 const dat = new Date(row.created_at);
                 return !isNaN(dat.getTime())
                     ? dat.toISOString().split("T")[0]
@@ -110,14 +75,13 @@ const DataTableComponent: React.FC = () => {
         },
         {
             name: "Acciones",
-            cell: (row: Events) => (
+            cell: (row: Diagosis) => (
                 <td className="p-4 flex justify-start">
-                    <DiagnosisDetailModal
+                    <DiagnosisDetailsModal
                         title=""
                         style={"hover:text-chileanFire-500"}
-                        content={"Ver Evento"}
+                        content={"Ver Diagnóstico"}
                         id={row.id}
-                        user={user}
                     />
                 </td>
             ),

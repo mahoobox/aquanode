@@ -13,4 +13,6 @@ urlpatterns = [
     path('events/', views.get_all, name='events'),
     path('update/<int:pk>/', views.update_event, name='update_event'),
     path('update_answer/<int:pk>/', views.update_answer, name='update_answer'),
+    path('diagnosis/', views.get_all_diagnosis, name='diagnosis'),
+    path('diagnosisdetail/<int:pk>/', views.get_diagnosis_detail, name='diagnosisdetail'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

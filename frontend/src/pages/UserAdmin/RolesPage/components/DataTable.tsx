@@ -7,7 +7,7 @@ import { getRoles } from "../../../../services/roles.api";
 
 const DataTableComponent: React.FC = () => {
   const [shouldDelete, setShouldDelete] = useState(false);
-	const [, setId] = useState<string>("");
+  const [, setId] = useState<string>("");
   const [data, setData] = useState<Role[]>([]);
   const [filteredData, setFilteredData] = useState<Role[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -49,7 +49,7 @@ const DataTableComponent: React.FC = () => {
   const columns = [
     {
       name: "#",
-      selector: (row: Role) => row.id??0,
+      selector: (row: Role) => row.id ?? 0,
       sortable: true,
       cell: (row: Role) => <span data-label="Id">{row.id ?? 0}</span>
     },
@@ -60,9 +60,9 @@ const DataTableComponent: React.FC = () => {
       cell: (row: Role) => <span data-label="Nombre">{row.name}</span>
     },
     {
-      name: "Fecha de creación",
-      selector: () => {
-        const dat = new Date();
+      name: "Fecha de Creación",
+      selector: (row: Role) => {
+        const dat = new Date(row.created_at);
         return !isNaN(dat.getTime())
           ? dat.toISOString().split("T")[0]
           : "Fecha no válida";
@@ -71,8 +71,8 @@ const DataTableComponent: React.FC = () => {
     },
     {
       name: "Fecha de Actualización",
-      selector: () => {
-        const dat = new Date();
+      selector: (row: Role) => {
+        const dat = new Date(row.updated_at);
         return !isNaN(dat.getTime())
           ? dat.toISOString().split("T")[0]
           : "Fecha no válida";
