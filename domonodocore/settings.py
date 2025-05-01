@@ -66,7 +66,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'aquanodecore.urls'
+ROOT_URLCONF = 'domonodocore.urls'
 
 TEMPLATES = [
     {
@@ -87,7 +87,7 @@ TEMPLATES = [
 if DEBUG:
     TEMPLATES[0]['DIRS'] = [os.path.join(BASE_DIR, 'dist')]
 
-WSGI_APPLICATION = 'aquanodecore.wsgi.application'
+WSGI_APPLICATION = 'domonodocore.wsgi.application'
 
 
 # Database
@@ -130,7 +130,7 @@ LOGGING = {
         'file': {
             'level': 'ERROR',
             'class': 'logging.FileHandler',
-            'filename': '../errors.log',
+            'filename': 'errors.log',
         },
     },
     'loggers': {
