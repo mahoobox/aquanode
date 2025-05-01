@@ -50,6 +50,30 @@ select {
     transition: opacity 0.2s ease-in-out, height 0.2s ease-in-out;
 }
 
+.video-player {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.responsive-iframe {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+}
+
+.responsive-iframe iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+
 .btn-primary {
     @apply rounded-md bg-gradient-to-r from-indigo-600 to-purple-600 px-5 py-2 text-sm font-semibold text-matisse-50 shadow-sm transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 hover:from-indigo-600 hover:to-purple-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600 sm:text-base tracking-wider;
 }

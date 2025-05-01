@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "core.users",
     "core.roles",
     "core.diagnosis",
+    "core.quality",
 ]
 
 MIDDLEWARE = [

@@ -12,6 +12,8 @@ class EventsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Events
         fields = '__all__'
+    
+    aprobbed = serializers.BooleanField(required=False, allow_null=True, default=None)
 
     def to_representation(self, instance):
         """

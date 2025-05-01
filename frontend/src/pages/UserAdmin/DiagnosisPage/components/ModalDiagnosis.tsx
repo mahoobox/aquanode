@@ -52,7 +52,6 @@ const DiagnosisDetailsModal = ({ title, style, content, id }: DiagnosisDetailsMo
 
             const formattedDate = formatDate(createdAt);
             setValue("analyzed_image", firstItem.analyzed_image);
-            setValue("ubicacion", firstItem.ubicacion);
             setValue("model_answer", firstItem.model_answer);
             setValue("model_result", firstItem.model_result);
             setValue("user", firstItem.user);
@@ -138,27 +137,6 @@ const DiagnosisDetailsModal = ({ title, style, content, id }: DiagnosisDetailsMo
                                 >
                                     <div className="mt-6 mb-8 grid grid-cols-1 gap-1 lg:grid-cols-8 lg:gap-8">
                                         <div className="sm:col-span-12 sm:col-start-1">
-                                            <div className="flex">
-                                                <label
-                                                    className="block text-sm font-medium leading-6 flex-initial mr-2 sm:text-base"
-                                                >
-                                                    * Ubicación
-                                                </label>
-                                            </div>
-                                            <textarea
-                                                {...register("ubicacion")}
-                                                rows={2}
-                                                maxLength={5000}
-                                                placeholder="Ubicación"
-                                                readOnly
-                                                className="block w-full rounded-md border-0 p-2 shadow-sm ring-1 ring-inset ring-slateGray-300 focus:ring-1 focus:ring-inset focus:ring-slateGray-600 sm:text-base sm:leading-6"
-                                            ></textarea>
-                                            {errors.ubicacion && (
-                                                <span className="text-sm text-red-500">
-                                                    {errors.ubicacion.message as string}
-                                                </span>
-                                            )}
-
                                             <div className="mt-2">
                                                 <div className="flex">
                                                     <label
@@ -167,10 +145,9 @@ const DiagnosisDetailsModal = ({ title, style, content, id }: DiagnosisDetailsMo
                                                         * Imagen Analizada.
                                                     </label>
                                                 </div>
-
                                                 <img
                                                     className="block w-full rounded-md border-0 p-2 shadow-sm ring-1 ring-inset ring-slateGray-300 focus:ring-1 focus:ring-inset focus:ring-slateGray-600 sm:text-base sm:leading-6"
-                                                    src={`http://127.0.0.1:8000${imagerUrl}`}
+                                                    src={`${import.meta.env.VITE_IMAGE_URL}${imagerUrl}`}
                                                 />
                                             </div>
                                         </div>
@@ -252,7 +229,7 @@ const DiagnosisDetailsModal = ({ title, style, content, id }: DiagnosisDetailsMo
                                                         <input
                                                             type="text"
                                                             {...register("user")}
-                                                            required
+                                                            readOnly
                                                             className="block w-full rounded-md border-0 p-2 shadow-sm ring-1 ring-inset ring-slateGray-300 focus:ring-1 focus:ring-inset focus:ring-slateGray-600 sm:text-base sm:leading-6"
                                                         />
                                                     </div>
