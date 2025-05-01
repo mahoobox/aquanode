@@ -4,7 +4,6 @@ import { jwtDecode } from 'jwt-decode';
 import {
 	LogOut,
 	Home,
-	Settings,
 	Menu,
 } from 'lucide-react';
 import { MdMarkChatUnread, MdMarkChatRead } from 'react-icons/md';
@@ -17,7 +16,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { Events } from '../../interfaces';
 import { getUser } from "../../services/users.api";
-import { getDiagnosis } from '../../services/events_api';
+import { getNotiEvents } from '../../services/events_api';
 import { useAuth } from "../../services/auth";
 import { Token } from "../../interfaces";
 import ModulesPage from './ModulesPage/ModulesPage';
@@ -38,7 +37,7 @@ const LayutAdmin = () => {
 	useEffect(() => {
 		const fetchNotifications = async () => {
 			try {
-				const data = await getDiagnosis();
+				const data = await getNotiEvents();
 				setNotifications(data);
 				setUnreadCount(data.filter((notif: any) => !notif.is_read).length);
 			} catch (error) {
@@ -317,8 +316,8 @@ const LayutAdmin = () => {
 									/>
 								</div>
 								<div className="ml-3">
-									<div className="text-base font-medium text-gray-800">{user?.name || 'Demo User'}</div>
-									<div className="text-sm font-medium text-gray-500">{user?.email || 'demo@example.com'}</div>
+									<div className="text-base font-medium text-gray-800">{user?.name || 'User'}</div>
+									<div className="text-sm font-medium text-gray-500">{user?.email || 'acuicultura25@gmail.com'}</div>
 								</div>
 							</div>
 							<div className="mt-3 space-y-1">

@@ -85,7 +85,7 @@ const DataTableComponent: React.FC = () => {
             cell: (row: Events) => <span data-label="Oservaciones">{row.observation}</span>
         },
         {
-            name: "Aprovado",
+            name: "Aprobado",
             selector: (row: Events) => row.aprobbed,
             sortable: true,
             cell: (row: Events) => {

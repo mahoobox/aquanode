@@ -1,15 +1,21 @@
 import { useState, MouseEvent, useEffect } from "react";
 import { NewError, User } from "../interfaces";
 import { useForm } from "react-hook-form";
+import { jwtDecode } from "jwt-decode";
+import { saveUpdateOffline, syncPendingUpdates } from "../services/indexedDB";
 import {
     EyeIcon,
 } from "@heroicons/react/24/outline";
+import { useQuery } from "@tanstack/react-query";
+import { getUser, getUsers } from "../services/users.api";
 import { toast } from "react-hot-toast";
+import { useAuth } from '../services/auth';
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import TooltipHelper from "../components/TooltipHelper";
 import ButtonProcess from "../components/ButtonProcess";
 import { getEvent, UpdateEventRead, UpdateEvent } from '../services/events_api';
 import { Event } from "../interfaces";
+import { Token } from "../interfaces";
 
 interface DiagnosisDetailModalProps {
     title: string;
@@ -24,13 +30,18 @@ const DiagnosisDetailModal = ({ title, style, content, user, id }: DiagnosisDeta
     const [showModal, setShowModal] = useState(false);
     const [iframeUrl, setIframeUrl] = useState<string | null>(null);
     const [isAaprobbed, setIsAaprobbed] = useState<Boolean>();
+    const { isAuth } = useAuth();
 
     useEffect(() => {
+        const handleOnline = () => {
+            syncPendingUpdates(UpdateEvent);
+        };
         const fetchVideoUrl = async () => {
             try {
                 const data = await getEvent(id);
-                if (data && data.url) {
-                    const videoUrl = data.url;
+                const firstItem = data[0];
+                if (firstItem && firstItem.url) {
+                    const videoUrl = firstItem.url;
                     const videoId = videoUrl.split('/')[5];
                     const iframeUrl = `https://drive.google.com/file/d/${videoId}/preview`;
                     setIframeUrl(iframeUrl);
@@ -41,9 +52,25 @@ const DiagnosisDetailModal = ({ title, style, content, user, id }: DiagnosisDeta
                 console.error('Error al obtener la url:', error);
             }
         };
-
         fetchVideoUrl();
+        window.addEventListener("online", handleOnline);
+        return () => {
+            window.removeEventListener("online", handleOnline);
+        };
     }, [id])
+
+    const userId: number = isAuth
+        ? jwtDecode<Token>(useAuth.getState().getToken().access).user_id
+        : 0;
+
+    const {
+        data: users,
+
+    } = useQuery({
+        queryKey: ["user", userId],
+        queryFn: () => getUser(userId),
+        enabled: !!userId,
+    });
 
     const handleShowModal = (event: MouseEvent) => {
         event.preventDefault();
@@ -81,7 +108,8 @@ const DiagnosisDetailModal = ({ title, style, content, user, id }: DiagnosisDeta
     const getEventMutation = useMutation({
         mutationFn: () => getEvent(id as number),
         onSuccess: (data) => {
-            const createdAt = new Date(data.created_at)
+            const firstItem = data[0];
+            const createdAt = new Date(firstItem.created_at)
 
             function formatDate(date) {
                 const options = {
@@ -98,11 +126,12 @@ const DiagnosisDetailModal = ({ title, style, content, user, id }: DiagnosisDeta
             }
 
             const formattedDate = formatDate(createdAt);
-            setValue("events", data.events);
-            setValue("url", data.url);
-            setValue("observation", data.observation);
+            setValue("events", firstItem.events);
+            setValue("url", firstItem.url);
+            setValue("observation", firstItem.observation);
+            setValue("user_id", firstItem.user);
             setValue("created_at", formattedDate);
-            setIsAaprobbed(data.aprobbed)
+            setIsAaprobbed(firstItem.aprobbed)
         },
 
         onError: (error: NewError) => {
@@ -112,6 +141,7 @@ const DiagnosisDetailModal = ({ title, style, content, user, id }: DiagnosisDeta
         },
     });
     const queryClient = useQueryClient();
+
     const dataEvent = {
         observation: getValues("observation")?.trim() || "",
         aprobbed: getValues("aprobbed")?.trim() === "Aprobado" ? true : false,
@@ -133,11 +163,18 @@ const DiagnosisDetailModal = ({ title, style, content, user, id }: DiagnosisDeta
             setShowModal(false);
             onReset();
         },
-        onError: (error: NewError) => {
+        onError: async (error: NewError) => {
             setAnimation(false);
             toast.error(
-                error.response?.data?.detail || "Error al actualizar la información"
+                error.response?.data?.detail ||
+                "Error al actualizar. Se guardó localmente para sincronizar luego."
             );
+
+            // Guardar en IndexedDB si falla la actualización
+            await saveUpdateOffline({
+                id: id as number,
+                data: dataEvent,
+            });
         },
     });
 
@@ -166,7 +203,7 @@ const DiagnosisDetailModal = ({ title, style, content, user, id }: DiagnosisDeta
                     <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none"
                         onClick={handleCloseModal}
                     >
-                        <div className="relative w-auto my-6 mx-auto max-w-7xl h-[50rem]"
+                        <div className="relative w-auto my-6 mx-auto max-w-7xl h-[45rem]"
                             onClick={(e) => e.stopPropagation()}
                         >
                             {/*content*/}
@@ -224,19 +261,18 @@ const DiagnosisDetailModal = ({ title, style, content, user, id }: DiagnosisDeta
                                     <div className="mt-6 mb-8 grid grid-cols-1 gap-1 lg:grid-cols-8 lg:gap-8">
                                         <div className="sm:col-span-12 sm:col-start-1">
                                             <div className="video-player">
-                                                <iframe
-                                                    src={iframeUrl}
-                                                    width="800"
-                                                    height="360"
-                                                    frameBorder="0"
-                                                    allowFullScreen
-                                                    title="Google Drive Video Player"
-                                                ></iframe>
+                                                <div className="responsive-iframe">
+                                                    <iframe
+                                                        src={iframeUrl}
+                                                        allowFullScreen
+                                                        allow="autoplay"
+                                                        frameBorder="0"
+                                                        title="Google Drive Video Player"
+                                                    ></iframe>
+                                                </div>
                                             </div>
                                         </div>
-
                                     </div>
-
                                     <div className="mt-6 mb-8 grid grid-cols-1 gap-1 lg:grid-cols-8 lg:gap-8">
                                         <div className="sm:col-span-12 sm:col-start-1">
                                             <div className="mt-2">
@@ -285,7 +321,7 @@ const DiagnosisDetailModal = ({ title, style, content, user, id }: DiagnosisDeta
                                                 })}
                                                 className="text-sm w-full bg-slateGray-100 rounded-md border-0 p-1.5  shadow-sm ring-1 ring-inset ring-slateGray-300 focus:ring-1 focus:ring-inset focus:ring-slateGray-600 sm:text-base sm:leading-6 hover:cursor-text"
                                             >
-                                                
+
                                                 <option>
                                                     {isAaprobbed === null ? (
                                                         <span data-label="seleccionar">Seleccione una opción:</span>
@@ -300,6 +336,30 @@ const DiagnosisDetailModal = ({ title, style, content, user, id }: DiagnosisDeta
                                             </select>
                                         </div>
                                     </div>
+                                    {user.role === "Super Administrador" && getEventMutation.data?.[0]?.user && (
+
+                                        <div className="mt-2">
+                                            <div className="sm:col-span-2 sm:col-start-1">
+                                                <div className="flex">
+                                                    <label
+                                                        className="block text-sm font-medium leading-6 flex-initial mr-2 sm:text-base"
+                                                    >
+                                                        * Usuario que aprueba.
+                                                    </label>
+
+                                                </div>
+                                                <div className="mt-2">
+                                                    <input
+                                                        type="text"
+                                                        {...register("user_id")}
+                                                        readOnly
+                                                        className="block w-full rounded-md border-0 p-2 shadow-sm ring-1 ring-inset ring-slateGray-300 focus:ring-1 focus:ring-inset focus:ring-slateGray-600 sm:text-base sm:leading-6"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    )}
                                     {/*footer*/}
                                     <div className="flex items-center justify-end p-6 border-t border-solid border-blueGray-200 rounded-b">
 

@@ -1,7 +1,7 @@
 import { Event } from "../interfaces";
 import { authAxios } from "../hooks/useAxios";
 
-export const getDiagnosis = async () => {
+export const getNotiEvents = async () => {
     const response = await authAxios.get("/diagnosis/notifications/");
     return response.data;
 };

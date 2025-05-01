@@ -54,6 +54,8 @@ def unread_notifications(request):
     data = [{
         'id': n.id,
         'events': n.events,
+        'observation': n.observation,
+        'aprobbed': n.aprobbed,
         'url': n.url,
         'is_read': n.is_read,
         'created_at': n.created_at
@@ -80,11 +82,22 @@ def get_all(request):
 @permission_classes([IsAuthenticated])
 def get_event(request, pk):
     try:
-        user = Events.objects.get(id=pk)
-        serializer = EventsSerializer(user, many=False)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        event = Events.objects.filter(id=pk)
+        data = []
+        for n in event:
+            data.append({
+                'id': n.id,
+                'events': n.events,
+                'observation': n.observation if n.observation is not None else "",
+                'aprobbed':  n.aprobbed if n.aprobbed is not None else "",
+                'url': n.url,
+                'user': (n.user.name + " " + n.user.last_name) if n.user else "",
+                'is_read': n.is_read,
+                'created_at': n.created_at
+        })
+        return Response(data)
     except:
-        message = {"detail": "El Evento no existe"}
+        message = {"detail": "No hay Eventos registrados"}
         return Response(message, status=status.HTTP_400_BAD_REQUEST)    
 
 @api_view(['PATCH'])

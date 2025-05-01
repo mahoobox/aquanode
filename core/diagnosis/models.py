@@ -18,7 +18,7 @@ class Diagnosis(models.Model):
 class Events(models.Model):
     events = models.CharField("events", max_length=255 , blank=True, null=True) 
     url = models.URLField("events", blank=True, null=True)
-    aprobbed = models.BooleanField(null=True, default=False) 
+    aprobbed = models.BooleanField(null=True, default=None)
     observation = models.TextField("observation", blank=True, null=True)
     is_read = models.BooleanField(default=False)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
