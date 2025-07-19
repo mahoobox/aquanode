@@ -66,7 +66,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'aquanodecorecore.urls'
+ROOT_URLCONF = 'aquanodecore.urls'
 
 TEMPLATES = [
     {
@@ -87,7 +87,7 @@ TEMPLATES = [
 if DEBUG:
     TEMPLATES[0]['DIRS'] = [os.path.join(BASE_DIR, 'dist')]
 
-WSGI_APPLICATION = 'aquanodecorecore.wsgi.application'
+WSGI_APPLICATION = 'aquanodecore.wsgi.application'
 
 
 # Database
@@ -205,4 +205,19 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     )
+}
+
+
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'America/Bogota'
+
+CELERY_BEAT_SCHEDULE = {
+    'delete-old-videos-monthly': {
+        'task': 'core.diagnosis.tasks.delete_old_videos_task',
+        'schedule': timedelta(days=30),
+    },
 }

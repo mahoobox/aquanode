@@ -20,16 +20,13 @@ from core.utils.encryption import decrypt_password
 def register_user(request):
     """
         Register a new user
-
         :param request: Request object
         :type request: HttpRequest
         :return: Response object
         :rtype: HttpResponse
         :raises Role.DoesNotExist: If the role does not exist
-        :raises Company.DoesNotExist: If the company does not exist
         :raises IntegrityError: If the email already exists
         :raises Exception: If there is an error when registering the user
-
     """   
     try:
         data = request.data
@@ -110,13 +107,59 @@ def update_user(request, pk):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def update_fcm_token(request):
+    """
+        Register a new Token
+
+        :param request: Request object
+        :type request: HttpRequest
+        :return: Response object
+        :rtype: HttpResponse
+        :raises Token.DoesNotExist: If the Token does not exist
+        :raises Exception: If there is an error when registering the Token
+    """ 
+    
     user = request.user 
     fcm_token = request.data.get('fcm_token') 
+    
     if not fcm_token:
         return Response({'error': 'FCM token es requerido'}, status=status.HTTP_400_BAD_REQUEST)
-    user.fcm_token = fcm_token
-    user.save()
-    return Response({'status': 'Token actualizado correctamente'}, status=status.HTTP_200_OK)
+
+    if not user.fcm_token:
+        user.fcm_token = fcm_token
+        user.save()
+        return Response({'status': 'Token registrado correctamente'}, status=status.HTTP_200_OK)
+    
+    if user.fcm_token != fcm_token:
+        user.fcm_token = fcm_token
+        user.save()
+        return Response({'status': 'Token actualizado correctamente'}, status=status.HTTP_200_OK)
+    
+    return Response({'status': 'El token no ha cambiado'}, status=status.HTTP_200_OK)
+
+
+@api_view(["DELETE"])
+@permission_classes([IsAuthenticated])
+@permission_required("Super Administrador")
+def delete_user(request, pk):
+    """
+    Delete a User by id
+
+    :param request: Request object
+    :type request: HttpRequest
+    :param pk: User id
+    :type pk: int
+    :return: Response object
+    :rtype: HttpResponse
+
+    """
+    try:
+        user = User.objects.get(id=pk)
+        user.delete()
+        message = {"detail": "El Usuario ha sido eliminado"}
+        return Response(message, status=status.HTTP_200_OK)
+    except:
+        message = {"detail": "El Usuario no existe"}
+        return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LoginUserView(TokenObtainPairView):

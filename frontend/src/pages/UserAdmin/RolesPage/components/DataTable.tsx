@@ -1,17 +1,36 @@
 import React, { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
 import { Role } from "../../../../interfaces";
+import { toast } from "react-hot-toast";
 import RolesModal from "./RolesModal";
 import AlertDelete from "../../../../components/AlertDelete.tsx";
-import { getRoles } from "../../../../services/roles.api";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { getRoles, deleteRole } from "../../../../services/roles.api";
+import { NewError } from "../../../../interfaces/index.ts";
 
 const DataTableComponent: React.FC = () => {
   const [shouldDelete, setShouldDelete] = useState(false);
-  const [, setId] = useState<string>("");
+  const [id, setId] = useState<string>("");
   const [data, setData] = useState<Role[]>([]);
   const [filteredData, setFilteredData] = useState<Role[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchText, setSearchText] = useState<string>("");
+  
+
+  const queryClient = useQueryClient();
+  
+	const deleteMutation = useMutation({
+		mutationFn: () => deleteRole(Number(id)),
+		onSuccess: () => {
+			toast.success("Rol eliminado con éxito.");
+			queryClient.setQueryData(["roles"], (oldData: Role[] | undefined) =>
+				oldData ? oldData.filter((role) => role.id !== Number(id)) : oldData
+			);
+		},
+		onError: (error: NewError) => {
+			toast.error(error.response?.data?.detail || "Error al eliminar el rol.");
+		},
+	});
 
   const fetchData = async () => {
     try {
@@ -30,8 +49,12 @@ const DataTableComponent: React.FC = () => {
   };
 
   useEffect(() => {
+    if (shouldDelete) {
+			deleteMutation.mutateAsync();
+			setShouldDelete(false);
+		}
     fetchData();
-  }, []);
+  }, [shouldDelete, deleteMutation]);
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchText(event.target.value);

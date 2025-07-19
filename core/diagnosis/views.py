@@ -25,16 +25,19 @@ def register_events(request):
 
     """     
     serializer = EventsSerializer(data=request.data)
+    print("Los datos de los eventos son: ", serializer)
     if serializer.is_valid():
         serializer.save()
         tokens = list(
             User.objects
             .filter(fcm_token__isnull=False)
+            .filter(role__in=[1, 2])
             .values_list('fcm_token', flat=True)
         ) 
+        print("Los datos de token son: ", tokens.query)
         if tokens:
             print(f"Enviando a {len(tokens)} tokens")
-            for token in tokens:  # Envía uno por uno
+            for token in tokens: 
                 try:
                     fcm.send_push_notification(str(token), request.data.get("events"), request.data.get("url"))
                 except Exception as e:
@@ -50,13 +53,14 @@ def register_events(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def unread_notifications(request):
-    notifications = Events.objects.order_by('-created_at')
+    notifications = Events.objects.order_by('-created_at')    
     data = [{
         'id': n.id,
         'events': n.events,
         'observation': n.observation,
         'aprobbed': n.aprobbed,
         'url': n.url,
+        'video_file': n.video_file.name if n.video_file else None,
         'is_read': n.is_read,
         'created_at': n.created_at
     } for n in notifications]
@@ -90,7 +94,7 @@ def get_event(request, pk):
                 'events': n.events,
                 'observation': n.observation if n.observation is not None else "",
                 'aprobbed':  n.aprobbed if n.aprobbed is not None else "",
-                'url': n.url,
+                'url': n.url,             
                 'user': (n.user.name + " " + n.user.last_name) if n.user else "",
                 'is_read': n.is_read,
                 'created_at': n.created_at
@@ -149,30 +153,37 @@ def register_diagnosis(request):
     """  
     try:
         file = request.FILES.get('analyzed_image')
-        data = request.data
+        data = request.data        
+        
+        model_result_data = {}
+    
+        if 'model_result' in request.data:
+            model_result_data = request.data['model_result']
+        else:
+            for key, value in request.data.items():
+                if 'model_result' in key:
+                    disease = key.split('[')[-1].rstrip(']')
+                    model_result_data[disease] = float(value[0] if isinstance(value, list) else value)
 
-        def safe_float_from_form(data, key):
-            try:
-                value = data.get(key)
-                if isinstance(value, list):
-                    value = value[0]
-                return float(value)
-            except (TypeError, ValueError, IndexError):
-                return None
+        resultado_final = {}
 
-        sano = safe_float_from_form(request.data, 'model_result[Ojo Sano]')
-        nublado = safe_float_from_form(request.data, 'model_result[Ojo Nublado]')
-        branquias = safe_float_from_form(request.data, 'model_result[branquias]')
-        hongos = safe_float_from_form(request.data, 'model_result[hongos]')
-        ich = safe_float_from_form(request.data, 'model_result[ich]')
-
-        resultado_final = {
-            'Ojo Sano': sano,
-            'Ojo Nublado': nublado,
-            'Branquias': branquias,
-            'Hongos': hongos,
-            'ICH': ich
+        key_mapping = {
+            'ich': 'ICH',
+            'hongos': 'Hongos',
+            'branquias': 'Branquias',
+            'ojo_nublado': 'Ojo Nublado',
+            'ojo_sano': 'Ojo Sano'
         }
+    
+        for disease, value in model_result_data.items():
+            normalized_key = disease.lower().strip().replace(" ", "_")
+            if normalized_key in key_mapping:
+                resultado_final[key_mapping[normalized_key]] = float(value)
+            else:
+                resultado_final[disease] = float(value)
+
+        print("Datos a guardar:", resultado_final)
+            
         user = User.objects.get(id=data['user_id'])
         defaults = {
             'analyzed_image': file,
@@ -188,7 +199,7 @@ def register_diagnosis(request):
         return Response({'id': Diagnos.id, 'data': serializer.data}, status=status.HTTP_200_OK)
     except Exception as e:
         message = {
-            'detail': f'Error al registrar la ecuesta convocatoria a asamblea: {str(e)}'}
+            'detail': f'Error al registrar el diagnostico: {str(e)}'}
         return Response(message, status=status.HTTP_500_INTERNAL_SERVER_ERROR)    
     
     

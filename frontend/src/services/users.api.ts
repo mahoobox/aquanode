@@ -32,3 +32,5 @@ export const loginUser = async (email: string, password: string) => {
 	return response;
 };
 
+export const deleteUser = async (id: number) => await authAxios.delete(`/users/delete/${id}/`);
+

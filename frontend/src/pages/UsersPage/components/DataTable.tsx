@@ -1,14 +1,35 @@
 import React, { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
 import { User } from "../../../interfaces";
+import { toast } from "react-hot-toast";
 import UsersModal from "./UsersModal";
-import { getUsers } from "../../../services/users.api";
+import { getUsers, deleteUser } from "../../../services/users.api";
+import AlertDelete from "../../../components/AlertDelete.tsx";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { NewError } from "../../../interfaces/index.ts";
 
 const DataTableComponent: React.FC = () => {
   const [data, setData] = useState<User[]>([]);
   const [filteredData, setFilteredData] = useState<User[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchText, setSearchText] = useState<string>("");
+  const [shouldDelete, setShouldDelete] = useState(false);
+  const [id, setId] = useState<string>("");
+
+  const queryClient = useQueryClient();
+  
+	const deleteMutation = useMutation({
+		mutationFn: () => deleteUser(Number(id)),
+		onSuccess: () => {
+			toast.success("Usuario eliminado con éxito.");
+			queryClient.setQueryData(["user"], (oldData: User[] | undefined) =>
+				oldData ? oldData.filter((role) => role.id !== Number(id)) : oldData
+			);
+		},
+		onError: (error: NewError) => {
+			toast.error(error.response?.data?.detail || "Error al eliminar el usuario.");
+		},
+	});
 
   const fetchData = async () => {
     try {
@@ -21,9 +42,18 @@ const DataTableComponent: React.FC = () => {
     }
   };
 
+  const handleDelete = (id: string) => {
+    setId(id);
+    setShouldDelete(!shouldDelete);
+  };
+
   useEffect(() => {
+    if (shouldDelete) {
+			deleteMutation.mutateAsync();
+			setShouldDelete(false);
+		}
     fetchData();
-  }, []);
+  }, [shouldDelete, deleteMutation]);
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchText(event.target.value);
@@ -82,6 +112,11 @@ const DataTableComponent: React.FC = () => {
             id={row.id}
             style={"hover:text-chileanFire-500"}
             content={"Editar Usuario"}
+          />
+          <AlertDelete
+            title={"Usuario"}
+            onDelete={handleDelete}
+            id={row && row.id ? row.id.toString() : ""}
           />
         </td>
       ),
