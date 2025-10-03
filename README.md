@@ -1,7 +1,5 @@
 # AquaNode - Sistema Inteligente de Monitoreo Acuícola
 
-![AquaNode](https://via.placeholder.com/1200x300.png?text=AquaNode+Project)
-
 AquaNode es una plataforma integral para el monitoreo y diagnóstico inteligente de parámetros de calidad del agua en entornos acuícolas. Combina un backend robusto construido con Django y un frontend moderno y reactivo con React.
 
 ## Características Principales
